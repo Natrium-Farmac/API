@@ -1,0 +1,50 @@
+{
+  "info": {
+    "name": "Natrium IA API",
+    "_postman_id": "natrium-ia-collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/health"
+      }
+    },
+    {
+      "name": "Chat",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:8000/chat",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"customer_id\": \"demo\", \"text\": \"Ol\\u00e1, quero enviar minha receita.\"}"
+        }
+      }
+    },
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "http://localhost:8000/orders",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"customer_id\": \"demo\", \"receita_url\": \"/static/demo.pdf\"}"
+        }
+      }
+    }
+  ]
+}

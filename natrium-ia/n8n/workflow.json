@@ -1,0 +1,77 @@
+{
+  "name": "Natrium WhatsApp -> API",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "whatsapp-incoming",
+        "options": {}
+      },
+      "id": "webhook-in",
+      "name": "Webhook (Evolution)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        200,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://backend:8000/chat",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{\"customer_id\": \"={{$json['from']}}\", \"text\": \"={{$json['message']}}\"}"
+      },
+      "id": "http-chat",
+      "name": "HTTP Request -> Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://your-evolution-api/messages/send",
+        "jsonParameters": true,
+        "options": {},
+        "bodyParametersJson": "{\"to\": \"={{$json['from']}}\", \"message\": \"={{$json['data']['reply']}}\"}"
+      },
+      "id": "http-send-wa",
+      "name": "HTTP Request -> WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        800,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook (Evolution)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request -> Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request -> Chat": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request -> WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
