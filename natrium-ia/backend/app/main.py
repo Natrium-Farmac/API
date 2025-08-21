@@ -13,9 +13,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+@app.get("/")
+def read_root():
+    return {"status": "ok", "message": "API is running successfully!"}
 
 app.include_router(chat.router, prefix="/chat", tags=["chat"])
 app.include_router(uploads.router, prefix="/upload", tags=["upload"])
