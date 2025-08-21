@@ -19,10 +19,10 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"status": "ok", "message": "API is running successfully!"}
+    return {"message": "API is live!"}
 
 @app.post("/chat")
-def chat_response (message:Message):
+def process_message(message: Message):
     return {"response": f"You said: {message.Message}"}
 
 app.include_router(chat.router, prefix="/chat", tags=["chat"])
