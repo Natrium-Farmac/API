@@ -17,6 +17,10 @@ app.add_middleware(
 def read_root():
     return {"status": "ok", "message": "API is running successfully!"}
 
+@app.post("/chat")
+def chat_response (message:Message):
+    return {"response": f"You said: {message.Message}"}
+
 app.include_router(chat.router, prefix="/chat", tags=["chat"])
 app.include_router(uploads.router, prefix="/upload", tags=["upload"])
 app.include_router(orders.router, prefix="/orders", tags=["orders"])
