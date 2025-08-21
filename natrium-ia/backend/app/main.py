@@ -1,7 +1,11 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from .core.config import settings
 from .routers import chat, uploads, orders
+
+class Message(BaseModel):
+    message: str 
 
 app = FastAPI(title="Natrium IA - Atendimento API", version="1.0.0")
 
