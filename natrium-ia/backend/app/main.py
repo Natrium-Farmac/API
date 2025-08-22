@@ -1,4 +1,3 @@
-from .routers import chat, uploads, orders
 # Importações necessárias do FastAPI e outras bibliotecas
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -47,11 +46,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-class Message(BaseModel):
-    message: str 
+# --- Fim da configuração do CORS ---
 
-#Função para carregar, processar e armazenar documentos para RAG
-#---------------------------------------------
+# --- Variáveis globais para RAG ---
+# Estas variáveis serão inicializadas na startup da aplicação
+vectorstore = None
+retriever = None
+llm = None
+chain = None
+# --- Fim das variáveis globais ---
+
+# Função para carregar, processar e armazenar documentos para RAG
 def load_and_process_documents(directory_path: str):
     """
     Carrega documentos de um diretório, divide-os, cria embeddings
@@ -137,28 +142,42 @@ def load_and_process_documents(directory_path: str):
         chain = None
         logging.error("RAG não será funcional devido ao erro de carregamento de documentos.")
 
-# --------------------------------------
 
-
-
-app = FastAPI(title="Natrium IA - Atendimento API", version="1.0.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# Rota para a raiz do aplicativo (apenas para verificar se está online)
 @app.post("/")
-def read_root():
-    return {"message": "API is live!"}
+async def root():
+    logging.info("Requisição GET recebida na raiz.")
+    return {"message": "Chatbot da Farmácia está online e aguardando mensagens!"}
 
-@app.post("/chat")
-def process_message(message: Message):
-    return {"response": f"You said: {message.Message}"}
+# --- Endpoint para o frontend web ---
+class ChatRequest(BaseModel):
+    user_message: str
 
-app.include_router(chat.router, prefix="/chat", tags=["chat"])
-app.include_router(uploads.router, prefix="/upload", tags=["upload"])
-app.include_router(orders.router, prefix="/orders", tags=["orders"])
+@app.post("/api/chat")
+async def handle_chat_message(request: ChatRequest):
+    logging.info(f"Requisição de chat recebida: {request.user_message}")
+
+    if not chain:
+        logging.error("A cadeia RAG não foi inicializada.")
+        return {"response": "Desculpe, o sistema de conhecimento está indisponível no momento."}
+
+    try:
+        # A nova cadeia LangChain já trata a entrada de forma simples,
+        # portanto, passamos a mensagem do usuário diretamente.
+        bot_response = chain.invoke(request.user_message)
+        logging.info(f"Resposta gerada pelo bot para o chat: {bot_response}")
+        return {"response": bot_response}
+    except Exception as e:
+        logging.error(f"Erro ao invocar a cadeia do chatbot: {e}")
+        return {"response": "Desculpe, ocorreu um erro ao processar sua solicitação."}
+# --- Fim do novo endpoint ---
+
+
+# Evento de startup da aplicação FastAPI
+@app.on_event("startup")
+async def startup_event():
+    logging.info("Aplicação iniciando. Carregando documentos para RAG...")
+    # O diretório 'data' deve conter os arquivos PDF
+    load_and_process_documents("data")
+    logging.info("Processo de carregamento de documentos concluído.")
+
