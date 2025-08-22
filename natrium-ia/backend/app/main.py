@@ -17,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+@app.post("/")
 def read_root():
     return {"message": "API is live!"}
 
