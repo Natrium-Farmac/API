@@ -8,10 +8,3 @@ supabase
 psycopg2-binary==2.9.9
 pillow==10.3.0
 pypdf==4.2.0
-python-dotenv
-langchain-openai
-langchain-core
-python-multipart
-pypdf
-chromadb
-langchain-community
