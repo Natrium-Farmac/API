@@ -18,11 +18,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/")
+@app.get("/")
 def read_root():
     return {"message": "API is live!"}
 
-@app.post("/chat")
+@app.get("/chat")
 def process_message(message: Message):
     return {"response": f"You said: {message.Message}"}
 
